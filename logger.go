@@ -10,19 +10,32 @@ import (
 )
 
 var logger *zap.SugaredLogger
-var logfile string = "./test.log"
+var logFile string = "./test.log"
+var logErrFile string = "./test.err.log"
 
+// 使用json格式打印日志
+// 日志输出到标准输出和日志文件中
+// 错误日志单独输出一份到标准错误和错误日志文件中
+// 以上日志文件均根据文件大小轮转
+// 实例化logger
 func init() {
 	encoder := getEncoder()
-	writeSyncer := getLogWriter()
-	core := zapcore.NewCore(encoder, writeSyncer, zapcore.InfoLevel)
 
+	writeSyncer := getLogWriter()
+	writeErrSyncer := getLogErrWriter()
+
+	c1 := zapcore.NewCore(encoder, writeSyncer, zapcore.InfoLevel)
+	c2 := zapcore.NewCore(encoder, writeErrSyncer, zapcore.ErrorLevel)
+
+	core := zapcore.NewTee(c1, c2)
 	logger = zap.New(core, zap.AddCaller()).Sugar()
 }
 
+// 根据文件大小轮转
+// 输出到标准输出
 func getLogWriter() zapcore.WriteSyncer {
 	lumberJackLogger := &lumberjack.Logger{
-		Filename:   logfile,
+		Filename:   logFile,
 		MaxSize:    1,
 		MaxBackups: 5,
 		MaxAge:     30,
@@ -33,6 +46,21 @@ func getLogWriter() zapcore.WriteSyncer {
 	return zapcore.AddSync(ws)
 }
 
+// 根据文件大小轮转
+// 输出到标准错误
+func getLogErrWriter() zapcore.WriteSyncer {
+	lumberJackErrLogger := &lumberjack.Logger{
+		Filename:   logErrFile,
+		MaxSize:    1,
+		MaxBackups: 5,
+		MaxAge:     30,
+		Compress:   false,
+	}
+	ws := io.MultiWriter(lumberJackErrLogger, os.Stderr)
+	return zapcore.AddSync(ws)
+}
+
+// 使用json编码器
 func getEncoder() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder

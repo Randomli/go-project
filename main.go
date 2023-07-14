@@ -9,8 +9,6 @@ package main
 import (
 	"fmt"
 	"os"
-
-	"libstudy"
 )
 
 func main() {
@@ -32,8 +30,15 @@ func main() {
 	// libstudy.TTimezoneDemo()
 	// libstudy.TUnixTimeDemo()
 	// libstudy.TPrintTime()
-	logger.Info("test")
-	libstudy.TUseMicrosecond()
+	// libstudy.TUseMicrosecond()
+	//
+	defer logger.Sync()
+	logger.Info("info级别日志")
+	logger.Error("error级别日志")
+	logger.Errorw("运行故障",
+		"reason", "不知道",
+		"new_key", "1",
+	)
 	code := 0
 	defer func() {
 		os.Exit(code)
