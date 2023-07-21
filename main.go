@@ -1,14 +1,8 @@
 package main
 
-// ref "henry.com/go-project/ref"
-
-// import (
-// 	"flag"
-// 	"fmt"
-// )
 import (
-	"fmt"
-	"os"
+	"leetcode_array"
+	"logger"
 )
 
 func main() {
@@ -32,34 +26,39 @@ func main() {
 	// libstudy.TPrintTime()
 	// libstudy.TUseMicrosecond()
 	//
+	// defer logger.Sync()
+	// logger.Info("info级别日志")
+	// logger.Error("error级别日志")
+	// logger.Errorw("运行故障",
+	// 	"reason", "不知道",
+	// 	"new_key", "1",
+	// )
+
+	// code := 0
+	// defer func() {
+	// 	os.Exit(code)
+	// }()
+	// subCmd := os.Args[1]
+	// switch subCmd {
+	// case "server":
+	// 	fmt.Println("run server")
+	// 	RunServer()
+	// case "client":
+	// 	fmt.Println("run client")
+	// 	RunClient()
+	// case "stick_server":
+	// 	fmt.Println("run stick_server")
+	// 	RunStickServer()
+	// case "stick_client":
+	// 	fmt.Println("run stick_client")
+	// 	RunStickClient()
+	// default:
+	// 	fmt.Println("子命令不支持")
+	// 	code = 1
+	// }
+
+	logger := logger.InitLogger(LOGFILE, LOGERRFILE)
 	defer logger.Sync()
 	logger.Info("info级别日志")
-	logger.Error("error级别日志")
-	logger.Errorw("运行故障",
-		"reason", "不知道",
-		"new_key", "1",
-	)
-	code := 0
-	defer func() {
-		os.Exit(code)
-	}()
-	subCmd := os.Args[1]
-	switch subCmd {
-	case "server":
-		fmt.Println("run server")
-		RunServer()
-	case "client":
-		fmt.Println("run client")
-		RunClient()
-	case "stick_server":
-		fmt.Println("run stick_server")
-		RunStickServer()
-	case "stick_client":
-		fmt.Println("run stick_client")
-		RunStickClient()
-	default:
-		fmt.Println("子命令不支持")
-		code = 1
-	}
-
+	leetcode_array.Run()
 }

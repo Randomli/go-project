@@ -1,4 +1,4 @@
-package main
+package logger
 
 import (
 	"io"
@@ -9,31 +9,31 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var logger *zap.SugaredLogger
-var logFile string = "./test.log"
-var logErrFile string = "./test.err.log"
+// var logger *zap.SugaredLogger
+// var logFile string = "./test.log"
+// var logErrFile string = "./test.err.log"
 
 // 使用json格式打印日志
 // 日志输出到标准输出和日志文件中
 // 错误日志单独输出一份到标准错误和错误日志文件中
 // 以上日志文件均根据文件大小轮转
 // 实例化logger
-func init() {
+func InitLogger(logFile string, logErrFile string) (logger *zap.SugaredLogger) {
 	encoder := getEncoder()
 
-	writeSyncer := getLogWriter()
-	writeErrSyncer := getLogErrWriter()
+	writeSyncer := getLogWriter(logFile)
+	writeErrSyncer := getLogErrWriter(logErrFile)
 
 	c1 := zapcore.NewCore(encoder, writeSyncer, zapcore.InfoLevel)
 	c2 := zapcore.NewCore(encoder, writeErrSyncer, zapcore.ErrorLevel)
 
 	core := zapcore.NewTee(c1, c2)
-	logger = zap.New(core, zap.AddCaller()).Sugar()
+	return zap.New(core, zap.AddCaller()).Sugar()
 }
 
 // 根据文件大小轮转
 // 输出到标准输出
-func getLogWriter() zapcore.WriteSyncer {
+func getLogWriter(logFile string) zapcore.WriteSyncer {
 	lumberJackLogger := &lumberjack.Logger{
 		Filename:   logFile,
 		MaxSize:    1,
@@ -48,7 +48,7 @@ func getLogWriter() zapcore.WriteSyncer {
 
 // 根据文件大小轮转
 // 输出到标准错误
-func getLogErrWriter() zapcore.WriteSyncer {
+func getLogErrWriter(logErrFile string) zapcore.WriteSyncer {
 	lumberJackErrLogger := &lumberjack.Logger{
 		Filename:   logErrFile,
 		MaxSize:    1,
