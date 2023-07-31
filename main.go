@@ -1,8 +1,8 @@
 package main
 
 import (
-	"leetcode_array"
-	"logger"
+	"henry.com/go-project/leetcode_array"
+	"henry.com/go-project/logger"
 )
 
 func main() {

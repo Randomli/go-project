@@ -1,7 +1,11 @@
 package leetcode_array
 
 import (
-	"logger"
+	"fmt"
+	"math/rand"
+	"time"
+
+	"henry.com/go-project/logger"
 )
 
 var LOGFILE string = "./leetcode_array.log"
@@ -127,26 +131,62 @@ func removeDuplicatesSolution(nums []int) int {
 	return l + 1
 }
 
-// 5. 给你一个有序数组 nums ，请你 原地 删除重复出现的元素，使得出现次数超过两次的元素只出现两次 ，返回删除后数组的新长度。
-// 不要使用额外的数组空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
+// 5. 给定有序数组 保留k个相同元素的通用解法
 func removeDuplicates2(nums []int) int {
-	n := len(nums)
-	if n <= 2 {
-		return n
-	}
-	l := 0
-	r := l + 1
-	for r <= n-1 {
-		// 三指针
-		if nums[r] != nums[l] {
-			if l+1 != r {
-				nums[l+1] = nums[r]
+	var process func(k int) int
+	process = func(k int) int {
+		// 记录切片的下标
+		i := 0
+		for _, v := range nums {
+			// 因为是有序的切片 将当前位置的前k个元素与当前元素比较
+			// 不同的 赋值给当前元素 i自增, 相同的 i不自增,循环下一个元素
+			// 如果i<k或者nums[i-k] != v，就将v赋值给nums[i]
+			if i < k || nums[i-k] != v {
+				nums[i] = v
+				i++
 			}
-			l++
 		}
-		r++
+		return i
 	}
-	return l + 1
+	return process(2)
+}
+
+// 6. 给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums
+// 原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+// 我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
+// 必须在不使用库内置的 sort 函数的情况下解决这个问题。
+func sortColors(nums []int) {
+	n := len(nums)
+	i := 0
+	l := 0
+	r := n - 1
+	for i <= r {
+		fmt.Println(i, l, r, nums)
+		switch nums[i] {
+		case 0:
+			nums[l], nums[i] = nums[i], nums[l]
+			l++
+			i++
+		case 2:
+			nums[r], nums[i] = nums[i], nums[r]
+			r--
+		case 1:
+			i++
+		}
+	}
+}
+
+// 7. 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
+// 请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+// 你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
+// 快速排序的思想
+// 随机选取一个元素作为主元 对主元前面的元素排序
+// 如果主元的下标q刚好等于k，那么主元就是第k大的元素
+// 否则，如果 q 比目标下标小，就递归右子区间，否则递归左子区间。
+// 这样就可以把原来递归两个区间变成只递归一个区间，提高了时间效率。
+func findKthLargest(nums []int, k int) int {
+	rand.Seed(time.Now().UnixNano())
+	return quickSelect(nums, 0, len(nums)-1, len(nums)-k)
 }
 
 func Run() {
@@ -178,8 +218,25 @@ func Run() {
 	// logger.Info(n)
 
 	// 5
-	nums := []int{0, 0, 1, 1, 1, 1, 1, 2, 3, 3}
-	n := removeDuplicates2(nums)
+	// 	nums := []int{0, 0, 1, 1, 1, 1, 1, 2, 3, 3}
+	// 	n := removeDuplicates2(nums)
+	// 	logger.Info(nums)
+	// 	logger.Info(n)
+
+	// 6
+	// nums := []int{2, 0, 1}
+	// sortColors(nums)
+	// logger.Info(nums)
+
+	// 7
+	nums := []int{2, 4, 1, 3, 9, 9, 8}
+	// 解法一：快速排序 效率更高
+	// k := findKthLargest(nums, 2)
+	// logger.Info(k)
+	// logger.Info(nums)
+
+	// 解法二：堆排序
+	kk := findKthLargestByHeap(nums, 2)
+	logger.Info(kk)
 	logger.Info(nums)
-	logger.Info(n)
 }
